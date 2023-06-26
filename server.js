@@ -5,6 +5,8 @@ const app = express();
 
 const accountKey = "FbQwubspQs+LjagFP5qsUA==";
 
+const desiredURL = "http://datamall2.mytransport.sg/ltaodataservice/TrainServiceAlerts";
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
@@ -12,7 +14,7 @@ app.use((req, res, next) => {
 });
 
 const requestOptions = {
-  url: "http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=83139",
+  url: desiredURL,
   method: "GET",
   json: {},
   headers: {
