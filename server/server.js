@@ -15,11 +15,13 @@ const desiredURLs = {
   carparkAvailabilityURL:
     "http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailabilityv2",
   platformCrowdURL:
+  // query string vs params
     "http://datamall2.mytransport.sg/ltaodataservice/PCDRealTime?TrainLine=",
   crowdForecastURL: 
     "http://datamall2.mytransport.sg/ltaodataservice/PCDForecast?TrainLine="
 };
 
+// middleware
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
@@ -52,7 +54,7 @@ const crowdForecast = {
   method: "GET",
   json: {},
   headers
-}
+};
 
 app.get("/servicealerts", (req, res) => {
   request(serviceAlert, (error, response, body) => {
@@ -79,19 +81,19 @@ app.get("/carparkavailability", (req, res) => {
 });
 
 app.get("/platformcrowd", (req, res) => {
+  if (req.query.TrainLine) {
+    platformCrowd.url = desiredURLs.platformCrowdURL + req.query.TrainLine;
+  } else {
+    res
+      .status(400)
+      .json({
+        type: "error",
+        message: "Missing query string for train line.",
+      });
+  }
   request(platformCrowd, (error, response, body) => {
-    if (req.query.TrainLine) {
-      platformCrowd.url = desiredURLs.platformCrowdURL + req.query.TrainLine;
-    } else {
-      res
-        .status(400)
-        .json({
-          type: "error",
-          message: "Missing query string for train line.",
-        });
-    }
-
     if (error || response.statusCode !== 200) {
+      console.log(error)
       res.status(response.statusCode).json({ type: "error", message: "Refer to status returned by response to continue troubleshooting." });
     } else {
       res.send(body);
@@ -100,18 +102,17 @@ app.get("/platformcrowd", (req, res) => {
 });
 
 app.get("/crowdforecast", (req, res) => {
+  if (req.query.TrainLine) {
+    crowdForecast.url = desiredURLs.crowdForecastURL + req.query.TrainLine;
+  } else {
+    res
+      .status(400)
+      .json({
+        type: "error",
+        message: "Missing query string for train line.",
+      });
+  }
   request(crowdForecast, (error, response, body) => {
-    if (req.query.TrainLine) {
-      crowdForecast.url = desiredURLs.crowdForecastURL + req.query.TrainLine;
-    } else {
-      res
-        .status(400)
-        .json({
-          type: "error",
-          message: "Missing query string for train line.",
-        });
-    }
-
     if (error || response.statusCode !== 200) {
       res.status(response.statusCode).json({ type: "error", message: "Refer to status returned by response to continue troubleshooting." });
     } else {
